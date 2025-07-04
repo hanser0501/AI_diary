@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI 日记</title>
+  <script>
+    async function saveDiary() {
+      const content = document.getElementById('diary').value;
+      await fetch('/save', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ content })
+      });
+      alert("日记已保存");
+      loadAll();
+    }
+
+    async function analyzeDiary() {
+      const content = document.getElementById('diary').value;
+      const res = await fetch('/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ content })
+      });
+      const data = await res.json();
+      document.getElementById('mood').innerText = '情绪：' + data.mood;
+      document.getElementById('song').innerText = '推荐歌曲：' + data.song.name;
+      document.getElementById('player').src = data.song.url;
+    }
+
+    async function loadAll() {
+      const res = await fetch('/get_all');
+      const data = await res.json();
+      const list = document.getElementById('history');
+      list.innerHTML = '';
+      for (const d of data) {
+        const li = document.createElement('li');
+        li.innerText = `${d.date}：${d.content}`;
+        list.appendChild(li);
+      }
+    }
+
+    window.onload = loadAll;
+  </script>
+</head>
+<body>
+  <h1>🌟 AI 日记</h1>
+  <textarea id="diary" rows="10" cols="60" placeholder="写下你今天的心情..."></textarea><br>
+  <button onclick="saveDiary()">💾 保存</button>
+  <button onclick="analyzeDiary()">🔍 分析心情</button>
+
+  <h2 id="mood">情绪：</h2>
+  <h3 id="song">推荐歌曲：</h3>
+  <p id="ai_reply">AI 情绪分析</p>
+  <audio id="player" controls></audio>
+
+  <h2>📅 历史日记</h2>
+  <ul id="history"></ul>
+</body>
+</html>
