@@ -54,43 +54,59 @@ client = OpenAI(
     base_url="https://api.siliconflow.cn/v1"
 )
 
+# 删除日记
+@app.route('/delete', methods=['POST'])
+def delete():
+    date = request.json.get('date')
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("DELETE FROM diary WHERE date = ?", (date,))
+    return jsonify({'status': 'success'})
+
 # 情绪分析 + 推荐歌曲
 @app.route('/analyze', methods=['POST'])
 def analyze():
     content = request.json.get('content')
-    responce = client.chat.completions.create(
-        # model='Pro/deepseek-ai/DeepSeek-R1',
+    # 第一部分：分析情绪
+    mood_response = client.chat.completions.create(
         model="Qwen/Qwen2.5-72B-Instruct",
         messages=[
-            {'role': 'user', 'content': f"请分析以下日记内容的用户心情，并返回一个关键词，例如 happy、sad、angry、neutral 等：\n{content}"}
-            ],
-            stream=True
-        )
-
-    result_text = ""
-    for chunk in responce:
-        if chunk.choices and chunk.choices[0].delta.content:
-            result_text += chunk.choices[0].delta.content
-
+            {'role': 'system', 'content': "你是一个情绪分析助手。请用单个英文单词回答用户的心情，必须是happy、sad、angry、neutral中的一个。"},
+            {'role': 'user', 'content': f"分析以下日记内容的心情：\n{content}"}
+        ],
+        temperature=0.3  # 降低随机性
+    )
+    
+    mood = mood_response.choices[0].message.content.lower().strip()
     mood_keywords = ['happy', 'sad', 'angry', 'neutral']
-    for key in mood_keywords:
-        if key in result_text.lower():
-            mood = key
-            break
-
+    if mood not in mood_keywords:
+        mood = 'neutral'  # 默认值
+    
+    # 第二部分：生成鼓励话语
+    encouragement_response = client.chat.completions.create(
+        model="Qwen/Qwen2.5-72B-Instruct",
+        messages=[
+            {'role': 'system', 'content': f"根据用户的心情({mood})，写一段体贴的鼓励或安慰的话。保持温暖积极的语气，不超过30字。"},
+            {'role': 'user', 'content': f"这是我的日记内容：\n{content}"}
+        ],
+        temperature=0.7
+    )
+    encouragement = encouragement_response.choices[0].message.content.strip()
+    
+    # 歌曲推荐
     mood_to_song = {
         'happy': {'name': 'Happy - Pharrell Williams', 'url': '/static/happy.mp3'},
         'sad': {'name': 'Someone Like You - Adele', 'url': '/static/sad.mp3'},
         'angry': {'name': 'Lose Yourself - Eminem', 'url': '/static/angry.mp3'},
         'neutral': {'name': 'Let It Be - Beatles', 'url': '/static/neutral.mp3'}
     }
-    # mp3 文件放在 static 文件夹下,命名必须与上面一致
     song = mood_to_song.get(mood, mood_to_song['neutral'])
+    
     return jsonify({
         'mood': mood,
         'song': song,
-        'ai_reply': result_text.strip()
-        })
+        'encouragement': encouragement,
+        'ai_reply': f"检测到你的心情是{mood}。{encouragement}"
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,59 +2,224 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI 日记</title>
+  <title>Mai 日记</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      padding: 8px 15px;
+      margin-right: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #history {
+      list-style-type: none;
+      padding: 0;
+    }
+    #history li {
+      background: white;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .ai-encouragement {
+      background-color: #e8f5e9;
+      border-left: 4px solid #4CAF50;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    .ai-encouragement h3 {
+      color: #2c3e50;
+      margin-top: 0;
+    }
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+    #analysis-result {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>🌟 Mai 日记</h1>
+  <textarea id="diary" rows="10" placeholder="记录下你今天的心情..."></textarea><br>
+  <button onclick="saveDiary()">💾 保存日记</button>
+  <button onclick="analyzeDiary()">🔍 听听麦麦的建议</button>
+
+  <div id="analysis-result">
+    <h2 id="mood">情绪：</h2>
+    <div id="encouragement" class="ai-encouragement"></div>
+    <h3 id="song">推荐歌曲：</h3>
+    <audio id="player" controls></audio>
+  </div>
+
+  <h2>📅 历史日记</h2>
+  <ul id="history"></ul>
+
   <script>
     async function saveDiary() {
       const content = document.getElementById('diary').value;
-      await fetch('/save', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ content })
-      });
-      alert("日记已保存");
-      loadAll();
+      if (!content.trim()) {
+        alert("日记内容不能为空");
+        return;
+      }
+      
+      try {
+        const response = await fetch('/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ content })
+        });
+        
+        if (response.ok) {
+          alert("日记已保存");
+          loadAll();
+          document.getElementById('diary').value = ''; // 清空输入框
+        } else {
+          alert("保存失败，请重试");
+        }
+      } catch (error) {
+        alert("网络错误: " + error.message);
+      }
     }
 
     async function analyzeDiary() {
       const content = document.getElementById('diary').value;
-      const res = await fetch('/analyze', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ content })
-      });
-      const data = await res.json();
-      document.getElementById('mood').innerText = '情绪：' + data.mood;
-      document.getElementById('song').innerText = '推荐歌曲：' + data.song.name;
-      document.getElementById('player').src = data.song.url;
-    }
-
-    async function loadAll() {
-      const res = await fetch('/get_all');
-      const data = await res.json();
-      const list = document.getElementById('history');
-      list.innerHTML = '';
-      for (const d of data) {
-        const li = document.createElement('li');
-        li.innerText = `${d.date}：${d.content}`;
-        list.appendChild(li);
+      if (!content.trim()) {
+        alert("请先输入日记内容");
+        return;
+      }
+      
+      try {
+        const res = await fetch('/analyze', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+        
+        // 显示分析结果区域
+        document.getElementById('analysis-result').style.display = 'block';
+        
+        // 更新情绪显示
+        document.getElementById('mood').innerText = '情绪：' + data.mood;
+        
+        // 更新鼓励话语
+        const encouragementDiv = document.getElementById('encouragement');
+        encouragementDiv.innerHTML = `
+          <h3>麦麦想对你说：</h3>
+          <p>${data.encouragement}</p>
+        `;
+        
+        // 更新歌曲推荐
+        document.getElementById('song').innerText = '推荐歌曲：' + data.song.name;
+        const player = document.getElementById('player');
+        player.src = data.song.url;
+        player.load(); // 重新加载音频
+        
+      } catch (error) {
+        alert("分析失败: " + error.message);
       }
     }
 
-    window.onload = loadAll;
+    // 删除日记函数
+    async function deleteDiary(date) {
+      if (!confirm(`确定要删除 ${date} 的日记吗？`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/delete', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ date })
+        });
+        
+        if (response.ok) {
+          alert("日记已删除");
+          loadAll(); // 刷新列表
+        } else {
+          alert("删除失败，请重试");
+        }
+      } catch (error) {
+        alert("网络错误: " + error.message);
+      }
+    }
+    
+    // 加载所有日记（唯一的一个loadAll函数）
+    async function loadAll() {
+      try {
+        const res = await fetch('/get_all');
+        const data = await res.json();
+        const list = document.getElementById('history');
+        list.innerHTML = '';
+        
+        if (data.length === 0) {
+          list.innerHTML = '<li>暂无历史日记</li>';
+          return;
+        }
+        
+        for (const d of data) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <strong>${d.date}</strong>
+            <button class="delete-btn" onclick="deleteDiary('${d.date}')">删除</button>
+            <p>${d.content}</p>
+          `;
+          list.appendChild(li);
+        }
+      } catch (error) {
+        console.error("加载历史日记失败:", error);
+      }
+    }
+
+    // 页面加载时初始化
+    window.onload = function() {
+      loadAll();
+      // 默认隐藏分析结果区域，直到用户点击分析按钮
+      document.getElementById('analysis-result').style.display = 'none';
+    };
   </script>
-</head>
-<body>
-  <h1>🌟 AI 日记</h1>
-  <textarea id="diary" rows="10" cols="60" placeholder="写下你今天的心情..."></textarea><br>
-  <button onclick="saveDiary()">💾 保存</button>
-  <button onclick="analyzeDiary()">🔍 分析心情</button>
-
-  <h2 id="mood">情绪：</h2>
-  <h3 id="song">推荐歌曲：</h3>
-  <p id="ai_reply">AI 情绪分析</p>
-  <audio id="player" controls></audio>
-
-  <h2>📅 历史日记</h2>
-  <ul id="history"></ul>
 </body>
 </html>
