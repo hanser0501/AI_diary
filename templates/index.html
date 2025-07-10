@@ -1,203 +1,563 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mai 日记</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* === 整体样式 === */
+    :root {
+      --primary: #8e44ad;
+      --primary-light: #9b59b6;
+      --secondary: #3498db;
+      --accent: #e74c3c;
+      --light: #f8f9fa;
+      --dark: #2c3e50;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --gray: #ecf0f1;
+      --border-radius: 12px;
+      --box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: 'Arial', sans-serif;
-      max-width: 800px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #f5f5f5;
-      transition: color 0.5s ease; /* 文字颜色过渡动画 */
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: var(--dark);
+      line-height: 1.6;
     }
+    
+    .container {
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    
+    h1, h2, h3 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      text-align: center;
+      padding: 15px 0;
+      font-size: 2.5rem;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 30px;
+    }
+    
+    h1 i {
+      margin-right: 10px;
+    }
+    
+    h2 {
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 10px;
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+    }
+    
+    h2 i {
+      margin-right: 10px;
+      color: var(--primary-light);
+    }
+    
+    /* === 输入区域 === */
     textarea {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--gray);
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 150px;
+      transition: var(--transition);
     }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.1);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
     button {
-      padding: 8px 15px;
-      margin-right: 10px;
-      background-color: #4CAF50;
-      color: white;
+      padding: 12px 25px;
       border: none;
-      border-radius: 4px;
+      border-radius: 50px;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    
+    button i {
+      margin-right: 8px;
+    }
+    
     button:hover {
-      background-color: #45a049;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.12);
     }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    #save-btn {
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      flex: 1;
+    }
+    
+    #analyze-btn {
+      background: linear-gradient(to right, var(--secondary), #3498db);
+      color: white;
+      flex: 1;
+    }
+    
+    /* === 分析结果 === */
+    #analysis-result {
+      background: linear-gradient(135deg, #f8f5ff 0%, #edf7ff 100%);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      margin: 30px 0;
+      box-shadow: var(--box-shadow);
+      border-left: 5px solid var(--primary);
+      display: none;
+      
+    }
+   
+    .mood-tag {
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 50px;
+      font-weight: bold;
+      margin-left: 10px;
+      text-transform: capitalize;
+    }
+    
+    .mood-happy { background-color: #d5f5e3; color: #27ae60; }
+    .mood-sad { background-color: #e8f4f8; color: #2980b9; }
+    .mood-angry { background-color: #fdebd0; color: #d35400; }
+    .mood-neutral { background-color: #eaf2f8; color: #7f8c8d; }
+    
+    .ai-encouragement {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      border-left: 4px solid var(--success);
+    }
+    
+    .ai-encouragement:before {
+      content: "“";
+      position: absolute;
+      top: -25px;
+      left: 10px;
+      font-size: 80px;
+      color: var(--gray);
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+    
+    .ai-encouragement h3 {
+      color: var(--primary);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .ai-encouragement h3 i {
+      margin-right: 10px;
+      color: var(--success);
+    }
+    
+    /* === 历史记录 === */
     #history {
       list-style-type: none;
       padding: 0;
     }
+    
     #history li {
       background: white;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
       position: relative;
+      transition: var(--transition);
     }
-    .ai-encouragement {
-      background-color: #e8f5e9;
-      border-left: 4px solid #4CAF50;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 0 5px 5px 0;
+    
+    #history li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
-    .ai-encouragement h3 {
-      margin-top: 0;
+    
+    #history li strong {
+      display: block;
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
     }
+    
     .delete-btn {
-      background-color: #f44336;
+      background-color: var(--accent);
       color: white;
       border: none;
-      border-radius: 3px;
-      padding: 3px 8px;
+      border-radius: 50px;
+      padding: 8px 15px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 14px;
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 20px;
+      right: 20px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
     }
+    
     .delete-btn:hover {
-      background-color: #d32f2f;
+      background-color: #c0392b;
+      transform: scale(1.05);
     }
+    
+    .delete-btn i {
+      margin-right: 5px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: var(--gray);
+    }
+    /* 诗歌区域样式 */
+    .poem-section {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: var(--box-shadow);
+      border-left: 4px solid var(--primary);
+    }
+
+     .poem-section h3 {
+       color: var(--primary);
+       margin-top: 0;
+       display: flex;
+       align-items: center;
+    }
+
+    .poem-section h3 i {
+       margin-right: 10px;
+       color: #e74c3c; /* 诗歌标题图标用红色调 */
+}
+
+     /* 情绪标签颜色细化 */
+    .mood-happy { background-color: #d5f5e3; color: #27ae60; }
+    .mood-sad { background-color: #e8f4f8; color: #2980b9; }
+    .mood-angry { background-color: #fdebd0; color: #d35400; }
+    .mood-neutral { background-color: #eaf2f8; color: #7f8c8d; }
+
+     /* 平滑过渡动画 */
+    .container, h1, h2 {
+      transition: all 0.5s ease;
+    }
+    /* === 音频播放器 === */
+    .song-recommendation {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .song-recommendation h3 {
+      display: flex;
+      align-items: center;
+      margin-top: 0;
+    }
+    
+    .song-recommendation h3 i {
+      margin-right: 10px;
+      color: var(--accent);
+    }
+    
     audio {
       width: 100%;
-      margin-top: 10px;
+      margin-top: 15px;
     }
-    #analysis-result {
-      background: white;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    /* === 响应式设计 === */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
     }
-    .color-recommendation {
-      margin: 15px 0;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px dashed #ccc;
-    }
-    .color-swatch {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 10px;
-      vertical-align: middle;
-    }
+    
+
   </style>
 </head>
 <body>
-  <h1>🌟 Mai 日记</h1>
-  <textarea id="diary" rows="10" placeholder="记录下你今天的心情..."></textarea><br>
-  <button onclick="saveDiary()">💾 保存日记</button>
-  <button onclick="analyzeDiary()">🔍 听听麦麦的建议</button>
-
-  <div id="analysis-result">
-    <h2 id="mood">情绪：</h2>
-    <div id="encouragement" class="ai-encouragement"></div>
+  <div class="container" id="main-container">
+    <h1 id="main-title"><i class="fas fa-book"></i> Mai 日记</h1>
     
-    <!-- 新增颜色推荐区域 -->
-    <div class="color-recommendation">
-      <h3>推荐搭配颜色：</h3>
-      <div>
-        <span class="color-swatch" id="colorSwatch"></span>
-        <span id="colorName"></span>
-        <span id="colorCode" style="font-family: monospace;"></span>
+    <textarea id="diary" rows="10" placeholder="记录下你今天的心情..."></textarea>
+    
+    <div class="btn-group">
+      <button id="save-btn" onclick="saveDiary()">
+        <i class="fas fa-save"></i> 保存日记
+      </button>
+      <button id="analyze-btn" onclick="analyzeDiary()">
+        <i class="fas fa-comment-alt"></i> 听听麦麦的建议
+      </button>
+    </div>
+
+    <div id="analysis-result">
+      <h2><i class="fas fa-heartbeat"></i> 情绪分析</h2>
+      <div id="mood-container">
+        <span>情绪：</span>
+        <span id="mood" class="mood-tag mood-neutral">等待分析...</span>
+      </div>
+      <!-- 推荐色区域 -->
+      <div id="color-recommend-block" style="margin: 18px 0; padding: 16px; border-radius: var(--border-radius); font-weight: bold; display: inline-block; background: linear-gradient(135deg, #f5f7fa 0%, #eaecee 100%); color: #2c3e50;">
+        推荐色系：<span id="color-recommendation">等待分析...</span>
+      </div>
+      <div class="ai-encouragement">
+        <h3><i class="fas fa-comment-dots"></i> 麦麦想对你说</h3>
+        <p id="encouragement">这里会显示麦麦给你的暖心建议...</p>
+      </div>
+      <div class="poem-section" id="poem-section">
+        <h3><i class="fas fa-pen-fancy"></i> 为你写诗</h3>
+        <div id="poem" style="white-space: pre-line; line-height: 1.8; padding: 20px; background-color: rgba(255,255,255,0.8); border-radius: var(--border-radius);">
+          这里会显示为你创作的诗歌...
+        </div>
+      </div>
+      <div class="song-recommendation">
+        <h3><i class="fas fa-music"></i> 推荐歌曲</h3>
+        <p id="song">这里会显示根据你心情推荐的歌曲</p>
+        <audio id="player" controls></audio>
       </div>
     </div>
-    
-    <h3 id="song">推荐歌曲：</h3>
-    <audio id="player" controls></audio>
+    <h2><i class="fas fa-history"></i> 历史日记</h2>
+    <ul id="history"></ul>
   </div>
 
-  <h2>📅 历史日记</h2>
-  <ul id="history"></ul>
-
   <script>
- 
-  // 其他函数保持不变...
-
-  async function analyzeDiary() {
-    const content = document.getElementById('diary').value;
-    if (!content.trim()) {
-      alert("请先输入日记内容");
-      return;
-    }
-    
-    try {
-      const res = await fetch('/analyze', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ content })
-      });
-      const data = await res.json();
-      
-      // 显示分析结果区域
-      document.getElementById('analysis-result').style.display = 'block';
-      
-      // 更新情绪显示
-      document.getElementById('mood').innerText = '情绪：' + data.mood;
-      
-      // 更新鼓励话语
-      const encouragementDiv = document.getElementById('encouragement');
-      encouragementDiv.innerHTML = `
-        <h3>麦麦想对你说：</h3>
-        <p>${data.encouragement}</p>
-      `;
-      
-      // 更新网页文字颜色
-      document.body.style.color = data.text_color;
-      
-      // 更新颜色推荐显示
-      const colorSwatch = document.getElementById('colorSwatch');
-      const colorName = document.getElementById('colorName');
-      const colorCode = document.getElementById('colorCode');
-      
-      colorSwatch.style.backgroundColor = data.recommend_color;
-      colorName.innerText = data.color_name;
-      colorCode.innerText = `(${data.recommend_color})`;
-      
-      // 更新歌曲推荐 - 增加错误处理
-      document.getElementById('song').innerText = '推荐歌曲：' + data.song.name;
-      const player = document.getElementById('player');
-      
-      // 重置播放器状态
-      player.pause();
-      player.src = '';
-      
-      // 设置新的音频源
-      player.src = data.song.url;
-      
-      // 监听错误事件
-      player.onerror = function() {
-        console.error('音频加载失败:', player.error);
-        alert('音频加载失败，请检查文件路径');
-      };
-      
-      // 尝试加载音频
-      try {
-        player.load();
-      } catch (error) {
-        console.error('音频加载异常:', error);
-        alert('音频加载异常: ' + error.message);
+    // 保存日记
+    async function saveDiary() {
+      const content = document.getElementById('diary').value;
+      if (!content.trim()) {
+        alert("日记内容不能为空");
+        return;
       }
-      
-    } catch (error) {
-      alert("分析失败: " + error.message);
+      try {
+        const response = await fetch('/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ content })
+        });
+        if (response.ok) {
+          alert("日记已保存");
+          loadAll();
+          document.getElementById('diary').value = '';
+        } else {
+          alert("保存失败，请重试");
+        }
+      } catch (error) {
+        alert("网络错误: " + error.message);
+      }
     }
-  }
 
-  // 其他函数保持不变...
-</script>
+    // 删除日记
+    async function deleteDiary(date) {
+  if (!confirm('确定要删除这条日记吗？')) return;
+  try {
+    const res = await fetch('/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ date })
+    });
+    const data = await res.json();
+    if (data.success) {
+      loadAll();
+    } else {
+      alert('删除失败，请重试');
+    }
+  } catch (error) {
+    alert('网络错误: ' + error.message);
+  }
+}
+
+    // 分析日记
+    // 修改分析日记函数，添加颜色更新和诗歌展示逻辑
+async function analyzeDiary() {
+  const content = document.getElementById('diary').value;
+  if (!content.trim()) {
+    alert("请先输入日记内容");
+    return;
+  }
+  try {
+    const res = await fetch('/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ content })
+    });
+    const data = await res.json();
+    document.getElementById('analysis-result').style.display = 'block';
+    const moodSpan = document.getElementById('mood');
+    moodSpan.innerText = data.mood_cn;
+    moodSpan.className = `mood-tag mood-${data.mood}`;
+    // 推荐色区域
+    const colorBlock = document.getElementById('color-recommend-block');
+    colorBlock.style.background = data.colors.gradient;
+    colorBlock.style.color = data.colors.text;
+    document.getElementById('color-recommendation').innerText = data.colors.recommended;
+    // 主色生成渐变色
+    function hexToRgba(hex, alpha) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+      const r = parseInt(hex.substring(0,2), 16);
+      const g = parseInt(hex.substring(2,4), 16);
+      const b = parseInt(hex.substring(4,6), 16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+    const mainColor = data.colors.primary;
+    const gradient = `linear-gradient(135deg, ${hexToRgba(mainColor,0.12)} 0%, ${hexToRgba(mainColor,0.32)} 100%)`;
+    // 页面主容器和背景
+    const container = document.getElementById('main-container');
+    container.style.background = gradient;
+    document.body.style.background = gradient;
+    // h1 主标题
+    const h1 = document.getElementById('main-title');
+    h1.style.background = `linear-gradient(to right, ${mainColor}, ${mainColor}80)`;
+    h1.style.backgroundClip = 'text';
+    h1.style.webkitBackgroundClip = 'text';
+    h1.style.color = 'transparent';
+    // h2 副标题
+    const h2Elements = document.querySelectorAll('h2');
+    h2Elements.forEach(h2 => {
+      h2.style.borderBottom = `2px solid ${mainColor}80`;
+      h2.querySelector('i').style.color = mainColor;
+      h2.style.color = mainColor;
+    });
+    // h3 标题（如诗歌、鼓励、歌曲）及其图标
+    const h3Elements = document.querySelectorAll('h3');
+    h3Elements.forEach(h3 => {
+      h3.style.color = mainColor;
+      const icon = h3.querySelector('i');
+      if (icon) icon.style.color = mainColor;
+    });
+    // 保存按钮、分析按钮
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.style.background = `linear-gradient(to right, ${mainColor}, ${mainColor}80)`;
+    saveBtn.style.color = '#fff';
+    const analyzeBtn = document.getElementById('analyze-btn');
+    analyzeBtn.style.background = `linear-gradient(to right, ${mainColor}, ${mainColor}80)`;
+    analyzeBtn.style.color = '#fff';
+    // 推荐歌曲、诗歌、鼓励话语等区域背景
+    document.querySelector('.song-recommendation').style.background = gradient;
+    document.getElementById('poem-section').style.background = gradient;
+    document.querySelector('.ai-encouragement').style.background = gradient;
+    // 鼓励话语
+    document.getElementById('encouragement').innerText = data.encouragement;
+    // 歌曲推荐
+    document.getElementById('song').innerText = data.song.name;
+    const player = document.getElementById('player');
+    player.src = data.song.url;
+    player.load();
+    // 诗歌区域
+    document.getElementById('poem-section').style.color = data.colors.text;
+    document.getElementById('poem').innerText = data.poem;
+    // 竖边动态变色
+    // #analysis-result、.ai-encouragement、#poem-section
+    const borderColor = `${mainColor}80`;
+    document.getElementById('analysis-result').style.borderLeft = `5px solid ${borderColor}`;
+    document.querySelector('.ai-encouragement').style.borderLeft = `4px solid ${borderColor}`;
+    document.getElementById('poem-section').style.borderLeft = `4px solid ${borderColor}`;
+  } catch (error) {
+    alert("分析失败: " + error.message);
+  }
+}
+
+    // 加载所有日记
+    async function loadAll() {
+      try {
+        const res = await fetch('/get_all');
+        const data = await res.json();
+        const list = document.getElementById('history');
+        list.innerHTML = '';
+        if (data.length === 0) {
+          list.innerHTML = '<li class="empty-state"><i class="fas fa-inbox"></i><br>暂无历史日记</li>';
+          return;
+        }
+        for (const d of data) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <strong>${d.date}</strong>
+            <button class="delete-btn" onclick="deleteDiary('${d.date}')"><i class='fas fa-trash'></i> 删除</button>
+            <p>${d.content}</p>
+          `;
+          list.appendChild(li);
+        }
+      } catch (error) {
+        console.error("加载历史日记失败:", error);
+      }
+    }
+
+    // 页面加载时初始化
+    window.onload = function() {
+      loadAll();
+      document.getElementById('analysis-result').style.display = 'none';
+    };
   </script>
 </body>
 </html>
