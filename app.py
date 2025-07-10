@@ -131,104 +131,104 @@ def analyze():
         # 积极情绪
         'happy': [
             {'name': 'Happy - Pharrell Williams', 'url': '/static/happy.mp3'},
-            {'name': 'Good Vibrations - The Beach Boys', 'url': '/static/happy2.mp3'},
-            {'name': 'Walking on Sunshine - Katrina and the Waves', 'url': '/static/happy3.mp3'}
+            {'name': 'Ed Sheeran - Galway Girl ', 'url': '/static/happy2.mp3'},
+            {'name': 'Troye Sivan - YOUTH', 'url': '/static/happy3.mp3'}
         ],
         'excited': [
-            {'name': 'Can\'t Stop The Feeling - Justin Timberlake', 'url': '/static/excited.mp3'},
-            {'name': 'Shut Up and Dance - Walk the Moon', 'url': '/static/excited2.mp3'},
-            {'name': 'Dynamite - BTS', 'url': '/static/excited3.mp3'}
+            {'name': 'Hillsong Young & Free - Wake', 'url': '/static/excited.mp3'},
+            {'name': 'RADWIMPS - 前前前世', 'url': '/static/excited2.mp3'},
+            {'name': 'Taio Cruz _ Flo Rida - Hangover', 'url': '/static/excited3.mp3'}
         ],
         'grateful': [
-            {'name': 'Thank You - Dido', 'url': '/static/grateful.mp3'},
-            {'name': 'Count on Me - Bruno Mars', 'url': '/static/grateful2.mp3'},
-            {'name': 'What a Wonderful World - Louis Armstrong', 'url': '/static/grateful3.mp3'}
+            {'name': 'YOASOBI - もしも命が描けたら (若能描绘生命)', 'url': '/static/grateful.mp3'},
+            {'name': '雨のパレード - morning (モーニング)', 'url': '/static/grateful2.mp3'},
+            {'name': '周杰伦 - 晴天', 'url': '/static/grateful3.mp3'}
         ],
         'proud': [
             {'name': 'Hall of Fame - The Script', 'url': '/static/proud.mp3'},
-            {'name': 'Stronger - Kelly Clarkson', 'url': '/static/proud2.mp3'},
-            {'name': 'Roar - Katy Perry', 'url': '/static/proud3.mp3'}
+            {'name': 'James Carter _ Nevve - Hands in the Fire (Explicit)', 'url': '/static/proud2.mp3'},
+            {'name': 'Stephen William Cornish _ Amanda Leigh Wilson - Stronger Than You Know', 'url': '/static/proud3.mp3'}
         ],
         'hopeful': [
             {'name': 'A Sky Full of Stars - Coldplay', 'url': '/static/hopeful.mp3'},
-            {'name': 'Here Comes the Sun - The Beatles', 'url': '/static/hopeful2.mp3'},
-            {'name': 'Brave - Sara Bareilles', 'url': '/static/hopeful3.mp3'}
+            {'name': 'Asher Monroe - Here With You', 'url': '/static/hopeful2.mp3'},
+            {'name': 'Fall Out Boy - Fake Out', 'url': '/static/hopeful3.mp3'}
         ],
         'relieved': [
-            {'name': 'Three Little Birds - Bob Marley', 'url': '/static/relieved.mp3'},
-            {'name': 'Don\'t Worry, Be Happy - Bobby McFerrin', 'url': '/static/relieved2.mp3'},
-            {'name': 'Over the Rainbow - Israel Kamakawiwo\'ole', 'url': '/static/relieved3.mp3'}
+            {'name': 'Goose house - 光るなら (若能绽放光芒)', 'url': '/static/relieved.mp3'},
+            {'name': 'Mayn - 人生進行形', 'url': '/static/relieved2.mp3'},
+            {'name': 'RADWIMPS - なんでもないや (没什么大不了) (Movie ver_)', 'url': '/static/relieved3.mp3'}
         ],
         'content': [
-            {'name': 'What a Wonderful World - Louis Armstrong', 'url': '/static/content.mp3'},
-            {'name': 'Banana Pancakes - Jack Johnson', 'url': '/static/content2.mp3'},
-            {'name': 'Island in the Sun - Weezer', 'url': '/static/content3.mp3'}
+            {'name': 'SawanoHiroyuki[nZk] _ Laco - Hands Up to the Sky', 'url': '/static/content.mp3'},
+            {'name': 'YOASOBI (ヨアソビ) - 群青', 'url': '/static/content2.mp3'},
+            {'name': '周杰伦 - 稻香', 'url': '/static/content3.mp3'}
         ],
         'calm': [
-            {'name': 'Weightless - Marconi Union', 'url': '/static/calm.mp3'},
-            {'name': 'River Flows in You - Yiruma', 'url': '/static/calm2.mp3'},
-            {'name': 'Clair de Lune - Debussy', 'url': '/static/calm3.mp3'}
+            {'name': 'Aimer (エメ) - Ref_rain', 'url': '/static/calm.mp3'},
+            {'name': '塞壬唱片-MSR_横山克 (よこやま まさる) - 春弦', 'url': '/static/calm2.mp3'},
+            {'name': '庄东茹 - 给我无尽不眠的春天', 'url': '/static/calm3.mp3'}
         ],
         
         # 中性/复杂情绪
         'surprised': [
             {'name': 'Uptown Funk - Mark Ronson ft. Bruno Mars', 'url': '/static/surprised.mp3'},
-            {'name': 'Happy Now - Zedd ft. Elley Duhé', 'url': '/static/surprised2.mp3'},
-            {'name': 'Feel It Still - Portugal. The Man', 'url': '/static/surprised3.mp3'}
+            {'name': 'Alexandra Stan _ Manilla Maniacs - All My People', 'url': '/static/surprised2.mp3'},
+            {'name': '就是南方凯 - 离别开出花 (弹唱版)', 'url': '/static/surprised3.mp3'}
         ],
         'nostalgic': [
-            {'name': 'Yesterday - The Beatles', 'url': '/static/nostalgic.mp3'},
-            {'name': 'Sweet Child O\' Mine - Guns N\' Roses', 'url': '/static/nostalgic2.mp3'},
-            {'name': 'Summer of \'69 - Bryan Adams', 'url': '/static/nostalgic3.mp3'}
+            {'name': 'Justin Timberlake、Carey Mulligan、Stark Sands - Five Hundred Miles', 'url': '/static/nostalgic.mp3'},
+            {'name': '王诗安 - Home', 'url': '/static/nostalgic2.mp3'},
+            {'name': '周杰伦 _ 费玉清 - 千里之外', 'url': '/static/nostalgic3.mp3'}
         ],
         'confused': [
-            {'name': 'Under Pressure - Queen', 'url': '/static/confused.mp3'},
-            {'name': 'Blinding Lights - The Weeknd', 'url': '/static/confused2.mp3'},
-            {'name': 'Stressed Out - Twenty One Pilots', 'url': '/static/confused3.mp3'}
+            {'name': 'YOASOBI - もしも命が描けたら (若能描绘生命)', 'url': '/static/confused.mp3'},
+            {'name': '郭顶 - 凄美地', 'url': '/static/confused2.mp3'},
+            {'name': '平凡之路 - 朴树', 'url': '/static/confused3.mp3'}
         ],
         'bored': [
-            {'name': 'Wake Me Up - Avicii', 'url': '/static/bored.mp3'},
-            {'name': 'Can\'t Hold Us - Macklemore & Ryan Lewis', 'url': '/static/bored2.mp3'},
-            {'name': 'Shake It Off - Taylor Swift', 'url': '/static/bored3.mp3'}
+            {'name': 'Akie秋绘 _ 夏璃夜 - アスノヨゾラ哨戒班 (明日的夜空哨戒班)', 'url': '/static/bored.mp3'},
+            {'name': 'Approaching Nirvana - You', 'url': '/static/bored2.mp3'},
+            {'name': '徐梦圆 _ 双笙 - 藏', 'url': '/static/bored3.mp3'}
         ],
         
         # 消极情绪
         'sad': [
-            {'name': 'Someone Like You - Adele', 'url': '/static/sad.mp3'},
-            {'name': 'Hurt - Johnny Cash', 'url': '/static/sad2.mp3'},
-            {'name': 'Say Something - A Great Big World', 'url': '/static/sad3.mp3'}
+            {'name': 'Avicii - The Days', 'url': '/static/sad.mp3'},
+            {'name': 'LiSA (織部里沙) - unlasting', 'url': '/static/sad2.mp3'},
+            {'name': '知更鸟_HOYO-MiX_Chevy - 使一颗心免于哀伤', 'url': '/static/sad3.mp3'}
         ],
         'angry': [
-            {'name': 'Lose Yourself - Eminem', 'url': '/static/angry.mp3'},
-            {'name': 'Killing in the Name - Rage Against the Machine', 'url': '/static/angry2.mp3'},
-            {'name': 'Break Stuff - Limp Bizkit', 'url': '/static/angry3.mp3'}
+            {'name': 'King Gnu - 飛行艇', 'url': '/static/angry.mp3'},
+            {'name': 'Little Mix - Shout Out to My Ex', 'url': '/static/angry2.mp3'},
+            {'name': 'TK from 凛冽时雨 (TK from 凛として時雨) - unravel', 'url': '/static/angry3.mp3'}
         ],
         'fearful': [
-            {'name': 'Fear of the Dark - Iron Maiden', 'url': '/static/fearful.mp3'},
-            {'name': 'Mad World - Gary Jules', 'url': '/static/fearful2.mp3'},
-            {'name': 'Disturbia - Rihanna', 'url': '/static/fearful3.mp3'}
+            {'name': 'Akie秋绘 - 春よ、来い。春天，来吧。', 'url': '/static/fearful.mp3'},
+            {'name': 'Fall Out Boy-Immortals-(电影《超能陆战队》主题曲)', 'url': '/static/fearful2.mp3'},
+            {'name': '米津玄師 (よねづ けんし) - Lemon', 'url': '/static/fearful3.mp3'}
         ],
         'disgusted': [
-            {'name': 'Bad Guy - Billie Eilish', 'url': '/static/disgusted.mp3'},
-            {'name': 'Monster - Skillet', 'url': '/static/disgusted2.mp3'},
-            {'name': 'Boulevard of Broken Dreams - Green Day', 'url': '/static/disgusted3.mp3'}
+            {'name': 'Aimer (エメ) - カタオモイ (单相思)', 'url': '/static/disgusted.mp3'},
+            {'name': '周杰伦 - 花海', 'url': '/static/disgusted2.mp3'},
+            {'name': '周深 - 光亮', 'url': '/static/disgusted3.mp3'}
         ],
         'anxious': [
-            {'name': 'Breathe Me - Sia', 'url': '/static/anxious.mp3'},
-            {'name': 'Anxiety - Julia Michaels', 'url': '/static/anxious2.mp3'},
-            {'name': 'Unwell - Matchbox Twenty', 'url': '/static/anxious3.mp3'}
+            {'name': 'Hugh Jackman _ Zac Efron - The Other Side', 'url': '/static/anxious.mp3'},
+            {'name': 'RADWIMPS (ラッドウィンプス) - カナタハルカ (遥远的彼方)', 'url': '/static/anxious2.mp3'},
+            {'name': '易言 _ 肥皂菌丨珉珉的猫咪丨 _ 赵方婧 _ 音阙诗听 - 彩虹节拍', 'url': '/static/anxious3.mp3'}
         ],
         'lonely': [
-            {'name': 'Hello - Adele', 'url': '/static/lonely.mp3'},
-            {'name': 'All by Myself - Eric Carmen', 'url': '/static/lonely2.mp3'},
-            {'name': 'Eleanor Rigby - The Beatles', 'url': '/static/lonely3.mp3'}
+            {'name': 'Asher Monroe - Here With You', 'url': '/static/lonely.mp3'},
+            {'name': 'DAISHI DANCE _ Cécile Corbel - Take Me Hand', 'url': '/static/lonely2.mp3'},
+            {'name': '周杰伦 - 花海', 'url': '/static/lonely3.mp3'}
         ],
         
         # 默认
         'neutral': [
-            {'name': 'Let It Be - Beatles', 'url': '/static/neutral.mp3'},
-            {'name': 'Imagine - John Lennon', 'url': '/static/neutral2.mp3'},
-            {'name': 'What a Wonderful World - Louis Armstrong', 'url': '/static/neutral3.mp3'}
+            {'name': 'AIYUE _ 理名 _ 塞壬唱片-MSR - Heavenly Me', 'url': '/static/neutral.mp3'},
+            {'name': 'HOYO-MiX _ NIDA - 拂晓 Proi Proi', 'url': '/static/neutral2.mp3'},
+            {'name': '明透 - 0g', 'url': '/static/neutral3.mp3'}
         ]
     }
     
