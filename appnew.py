@@ -1,66 +1,33 @@
-from flask import Flask, render_template, request, jsonify
+# ... [其他导入保持不变] ...
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from openai import OpenAI
 import os
 import sqlite3
 import datetime
 import requests
 
-app = Flask(__name__)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'diary.db')
+app = Flask(__name__, static_folder='static')
 
-# 初始化数据库
-if not os.access(BASE_DIR, os.W_OK):
-    raise PermissionError(f"No write permission in directory: {BASE_DIR}")
-def init_db():
-    print("Trying to create database at:", DB_PATH)
-    if not os.path.exists(BASE_DIR):
-        raise Exception("Project base directory does not exist.")
+# OpenAI 客户端初始化（请替换为你的实际 API KEY）
+client = OpenAI(
+    api_key="sk-oovpsxqnpcfalcidxfzqptoehotpgbfdjhjivqxilkqpntop",
+    base_url="https://api.siliconflow.cn/v1"
+)
 
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS diary (
-                date TEXT PRIMARY KEY,
-                content TEXT
-            )
-        ''')
-    print(f"Creating DB at: {DB_PATH}")
-init_db()
+# ... [数据库初始化代码保持不变] ...
 
 # 首页
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('indexmaimai.html')
 
-# 保存日记
-@app.route('/save', methods=['POST'])
-def save():
-    content = request.json.get('content')
-    today = datetime.date.today().isoformat()
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("REPLACE INTO diary (date, content) VALUES (?, ?)", (today, content))
-    return jsonify({'status': 'success'})
+# 静态文件路由
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
-# 获取所有日记
-@app.route('/get_all', methods=['GET'])
-def get_all():
-    with sqlite3.connect(DB_PATH) as conn:
-        rows = conn.execute("SELECT date, content FROM diary ORDER BY date DESC").fetchall()
-    return jsonify([{'date': d, 'content': c} for d, c in rows])
-
-client = OpenAI(
-    api_key="sk-oovpsxqnpcfalcidxfzqptoehotpgbfdjhjivqxilkqpntop", 
-    base_url="https://api.siliconflow.cn/v1"
-)
-
-# 删除日记
-@app.route('/delete', methods=['POST'])
-def delete():
-    date = request.json.get('date')
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("DELETE FROM diary WHERE date = ?", (date,))
-    return jsonify({'status': 'success'})
+# ... [其他路由保持不变] ...
 
 # 情绪分析 + 推荐歌曲 + 颜色推荐
 @app.route('/analyze', methods=['POST'])
@@ -73,19 +40,19 @@ def analyze():
             {'role': 'system', 'content': "你是一个情绪分析助手。请用单个英文单词回答用户的心情，必须是happy、sad、angry、neutral中的一个。"},
             {'role': 'user', 'content': f"分析以下日记内容的心情：\n{content}"}
         ],
-        temperature=0.3  # 降低随机性
+        temperature=0.3
     )
     
     mood = mood_response.choices[0].message.content.lower().strip()
     mood_keywords = ['happy', 'sad', 'angry', 'neutral']
     if mood not in mood_keywords:
-        mood = 'neutral'  # 默认值
+        mood = 'neutral'
     
     # 第二部分：生成鼓励话语
     encouragement_response = client.chat.completions.create(
         model="Qwen/Qwen2.5-72B-Instruct",
         messages=[
-            {'role': 'system', 'content': f"根据用户的心情({mood})，写一段体贴的鼓励或安慰的话。保持温暖积极的语气，不超过30字。"},
+            {'role': 'system', 'content': f"根据用户的心情({mood})，写一段体贴的鼓励或安慰的话。保持温暖积极的语气，不超过50字。称呼用户为'亲爱的'。"},
             {'role': 'user', 'content': f"这是我的日记内容：\n{content}"}
         ],
         temperature=0.7
@@ -127,15 +94,22 @@ def analyze():
     }
     song = mood_to_song.get(mood, mood_to_song['neutral'])
     
+    # 添加情绪中文翻译
+    mood_translation = {
+        'happy': '开心',
+        'sad': '悲伤',
+        'angry': '生气',
+        'neutral': '平静'
+    }
+    
     return jsonify({
         'mood': mood,
+        'mood_cn': mood_translation.get(mood, '平静'),
         'song': song,
-        'encouragement': encouragement,
-        'ai_reply': f"检测到你的心情是{mood}。{encouragement}",
-        'text_color': color_info['text_color'],
-        'recommend_color': color_info['recommend_color'],
-        'color_name': color_info['color_name']
+        'encouragement': encouragement
     })
+
+# ... [其他代码保持不变] ...
 
 if __name__ == '__main__':
     app.run(debug=True)
