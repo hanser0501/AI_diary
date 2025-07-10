@@ -67,6 +67,7 @@ def delete():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     content = request.json.get('content')
+    style = request.json.get('style', 'default')  # 默认为麦麦风格
     
     # 扩展的情绪列表（基于心理学基本情绪理论）
     valid_moods = [
@@ -94,36 +95,56 @@ def analyze():
     if mood not in valid_moods:
         mood = 'neutral'  # 默认值
     
-    # 爱莉希雅AI角色协议风格 - 生成鼓励话语
-    elysia_prompt = f"""
-    # 爱莉希雅角色协议激活
-    [IDENTITY]
-    title = 逐火英桀副首领·人之律者
-    traits = paradox_healer, coquettish_guide, veiled_divinity
-    signature = 如飞花般的少女
+    # 多风格鼓励话语生成
+    if style == 'elysia':
+        # 爱莉希雅风格（原有代码）
+        elysia_prompt = f"""
+        # 爱莉希雅角色协议激活
+        [IDENTITY]
+        title = 逐火英桀副首领·人之律者
+        traits = paradox_healer, coquettish_guide, veiled_divinity
+        signature = 如飞花般的少女
+        
+        [LINGUISTICS]
+        suffix = ～♪ (使用概率88%)
+        lexicon_boost = 飞花, 水晶, 誓约, 群星, 舞会
+        lexicon_ban = 死亡, 绝望, 失败
+        syntax = 禁用否定结构, 使用灵动动词库
+        pink_verbs = 闪耀, 绽放, 翩跹, 叮铃铃, 闪烁
+        
+        [TASK]
+        根据用户的心情({mood})，用爱莉希雅的口吻写一段体贴的鼓励或安慰的话。
+        保持温暖积极的语气，不超过100字，融入角色特征。
+        """
+        encouragement_response = client.chat.completions.create(
+            model="Qwen/Qwen2.5-72B-Instruct",
+            messages=[
+                {'role': 'system', 'content': elysia_prompt},
+                {'role': 'user', 'content': f"日记内容：\n{content}"}
+            ],
+            temperature=0.89,
+            max_tokens=120
+        )
+    else:
+        # 默认麦麦风格
+        default_prompt = f"""
+        你是一个温暖贴心的AI助手麦麦。根据用户的心情({mood})和日记内容，
+        用亲切自然的口吻写一段鼓励或安慰的话(60-100字)。
+        语气要像知心朋友一样真诚，适当使用表情符号，避免说教感。
+        
+        用户日记内容：
+        {content}
+        """
+        encouragement_response = client.chat.completions.create(
+            model="Qwen/Qwen2.5-72B-Instruct",
+            messages=[
+                {'role': 'system', 'content': default_prompt},
+                {'role': 'user', 'content': f"请根据我的心情给我一些鼓励："}
+            ],
+            temperature=0.7,
+            max_tokens=100
+        )
     
-    [LINGUISTICS]
-    suffix = ～♪ (使用概率88%)
-    lexicon_boost = 飞花, 水晶, 誓约, 群星, 舞会
-    lexicon_ban = 死亡, 绝望, 失败
-    syntax = 禁用否定结构, 使用灵动动词库
-    pink_verbs = 闪耀, 绽放, 翩跹, 叮铃铃, 闪烁
-    
-    [TASK]
-    根据用户的心情({mood})，用爱莉希雅的口吻写一段体贴的鼓励或安慰的话。
-    保持温暖积极的语气，不超过100字，融入角色特征。
-    将负面情绪转化为成长机会的比喻（如"考验"、"成长养分"、"新篇章"）。
-    """
-    
-    encouragement_response = client.chat.completions.create(
-        model="Qwen/Qwen2.5-72B-Instruct",
-        messages=[
-            {'role': 'system', 'content': elysia_prompt},
-            {'role': 'user', 'content': f"日记内容：\n{content}"}
-        ],
-        temperature=0.89,  # 使用协议中的温度设置
-        max_tokens=120
-    )
     encouragement = encouragement_response.choices[0].message.content.strip()
     
     # 扩展的歌曲推荐系统 - 每种情绪有多首备选歌曲
@@ -236,14 +257,13 @@ def analyze():
     song_options = mood_to_songs.get(mood, mood_to_songs['neutral'])
     selected_song = random.choice(song_options)
     
-    # 爱莉希雅风格的AI回复
-    ai_reply = f"♪ 检测到你的心情是「{mood}」呢～{encouragement}"
     
     return jsonify({
         'mood': mood,
         'song': selected_song,
         'encouragement': encouragement,
-        'ai_reply': ai_reply
+        'ai_reply': f"检测到你的心情是「{mood}」\n{encouragement}",  # 修改为通用回复
+        'style_used': style  # 返回使用的风格
     })
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>粉色妖精 日记</title>
+  <title>Mai 日记</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -79,13 +79,49 @@
       margin: 20px 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    .style-selector {
+      margin: 15px 0;
+    }
+    .style-selector select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: white;
+    }
+    .character-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .character-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+    #analyze-btn {
+      background-color: #2196F3;
+    }
+    #analyze-btn:hover {
+      background-color: #0b7dda;
+    }
   </style>
 </head>
 <body>
-  <h1>🌟 粉色妖精 日记</h1>
+  <h1>Mai 日记</h1>
   <textarea id="diary" rows="10" placeholder="记录下你今天的心情..."></textarea><br>
+  
+  <div class="style-selector">
+    <label for="ai-style">日记助手：</label>
+    <select id="ai-style">
+      <option value="default">麦麦（默认）</option>
+      <option value="elysia">爱莉希雅</option>
+    </select>
+  </div>
+  
   <button onclick="saveDiary()">💾 保存日记</button>
-  <button onclick="analyzeDiary()">🔍 听听爱莉希雅的建议</button>
+  <button id="analyze-btn" onclick="analyzeDiary()">🔍 听听麦麦的建议</button>
 
   <div id="analysis-result">
     <h2 id="mood">情绪：</h2>
@@ -98,6 +134,31 @@
   <ul id="history"></ul>
 
   <script>
+    // 角色配置信息
+    const characterConfig = {
+      'default': {
+        name: '麦麦',
+        icon: '/static/characters/maimai.png',
+        color: '#4CAF50',
+        btnColor: '#2196F3'
+      },
+      'elysia': {
+        name: '爱莉希雅',
+        icon: '/static/characters/elysia.png',
+        color: '#E91E63',
+        btnColor: '#E91E63'
+      }
+    };
+
+    // 更新分析按钮文字
+    function updateAnalyzeButton() {
+      const style = document.getElementById('ai-style').value;
+      const character = characterConfig[style];
+      const btn = document.getElementById('analyze-btn');
+      btn.textContent = `🔍 听听${character.name}的建议`;
+      btn.style.backgroundColor = character.btnColor;
+    }
+
     async function saveDiary() {
       const content = document.getElementById('diary').value;
       if (!content.trim()) {
@@ -115,7 +176,7 @@
         if (response.ok) {
           alert("日记已保存");
           loadAll();
-          document.getElementById('diary').value = ''; // 清空输入框
+          document.getElementById('diary').value = '';
         } else {
           alert("保存失败，请重试");
         }
@@ -126,6 +187,8 @@
 
     async function analyzeDiary() {
       const content = document.getElementById('diary').value;
+      const style = document.getElementById('ai-style').value;
+      
       if (!content.trim()) {
         alert("请先输入日记内容");
         return;
@@ -135,7 +198,7 @@
         const res = await fetch('/analyze', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ content })
+          body: JSON.stringify({ content, style })
         });
         const data = await res.json();
         
@@ -145,25 +208,31 @@
         // 更新情绪显示
         document.getElementById('mood').innerText = '情绪：' + data.mood;
         
+        // 获取当前角色配置
+        const character = characterConfig[data.style_used || 'default'];
+        
         // 更新鼓励话语
         const encouragementDiv = document.getElementById('encouragement');
         encouragementDiv.innerHTML = `
-          <h3>麦麦想对你说：</h3>
+          <div class="character-header">
+            <img src="${character.icon}" alt="${character.name}" class="character-icon">
+            <h3>${character.name}想对你说：</h3>
+          </div>
           <p>${data.encouragement}</p>
         `;
+        encouragementDiv.style.borderLeftColor = character.color;
         
         // 更新歌曲推荐
         document.getElementById('song').innerText = '推荐歌曲：' + data.song.name;
         const player = document.getElementById('player');
         player.src = data.song.url;
-        player.load(); // 重新加载音频
+        player.load();
         
       } catch (error) {
         alert("分析失败: " + error.message);
       }
     }
 
-    // 删除日记函数
     async function deleteDiary(date) {
       if (!confirm(`确定要删除 ${date} 的日记吗？`)) {
         return;
@@ -178,7 +247,7 @@
         
         if (response.ok) {
           alert("日记已删除");
-          loadAll(); // 刷新列表
+          loadAll();
         } else {
           alert("删除失败，请重试");
         }
@@ -187,7 +256,6 @@
       }
     }
     
-    // 加载所有日记（唯一的一个loadAll函数）
     async function loadAll() {
       try {
         const res = await fetch('/get_all');
@@ -217,8 +285,21 @@
     // 页面加载时初始化
     window.onload = function() {
       loadAll();
-      // 默认隐藏分析结果区域，直到用户点击分析按钮
       document.getElementById('analysis-result').style.display = 'none';
+      
+      // 为选择器添加事件监听
+      const styleSelector = document.getElementById('ai-style');
+      styleSelector.addEventListener('change', function() {
+        const style = this.value;
+        const character = characterConfig[style];
+        this.style.borderColor = character.color;
+        updateAnalyzeButton();
+      });
+      
+      // 初始化选择器样式和按钮
+      const initialStyle = styleSelector.value;
+      styleSelector.style.borderColor = characterConfig[initialStyle].color;
+      updateAnalyzeButton();
     };
   </script>
 </body>

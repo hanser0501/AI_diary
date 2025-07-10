@@ -32,5 +32,7 @@ Thumbs.db
 dist/
 build/
 
-# 忽略静态文件编译产物（可选）
+# 忽略静态文件编译产物
 static/*.mp3
+/static/characters/*
+!/static/characters/.gitkeep
