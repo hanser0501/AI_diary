@@ -1,137 +1,505 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Mai 日记</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mai 日记 - 情感日记助手</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
+    :root {
+      --primary: #6a5acd;
+      --primary-light: #7e6fe6;
+      --secondary: #ff6b6b;
+      --success: #4CAF50;
+      --info: #2196F3;
+      --warning: #FF9800;
+      --danger: #f44336;
+      --dark: #2c3e50;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
     }
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-    button {
-      padding: 8px 15px;
-      margin-right: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #history {
-      list-style-type: none;
+
+    * {
+      margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-    #history li {
-      background: white;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
       position: relative;
     }
-    .ai-encouragement {
-      background-color: #e8f5e9;
-      border-left: 4px solid #4CAF50;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 0 5px 5px 0;
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 280px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      z-index: -1;
+      border-radius: 0 0 40% 40%;
+      opacity: 0.95;
     }
-    .ai-encouragement h3 {
-      color: #2c3e50;
-      margin-top: 0;
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .delete-btn {
-      background-color: #f44336;
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
       color: white;
-      border: none;
-      border-radius: 3px;
-      padding: 3px 8px;
-      cursor: pointer;
-      font-size: 12px;
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      position: relative;
     }
-    .delete-btn:hover {
-      background-color: #d32f2f;
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    audio {
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .main-content {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      margin-bottom: 30px;
+      transition: var(--transition);
+    }
+
+    .card {
+      padding: 25px;
+    }
+
+    .card-header {
+      padding: 20px 25px;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-header i {
+      margin-right: 12px;
+      font-size: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    textarea {
       width: 100%;
-      margin-top: 10px;
+      min-height: 180px;
+      padding: 18px;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      resize: vertical;
+      transition: var(--transition);
+      background: #f8f9fa;
     }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
+      background: white;
+    }
+
+    .style-selector {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .style-selector label {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 1.1rem;
+    }
+
+    .style-selector select {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      background-color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .style-selector select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-save {
+      background: linear-gradient(to right, var(--success), #5cb85c);
+      color: white;
+    }
+
+    .btn-analyze {
+      background: linear-gradient(to right, var(--info), #1e88e5);
+      color: white;
+    }
+
+    .btn-delete {
+      background: linear-gradient(to right, var(--danger), #e53935);
+      color: white;
+    }
+
     #analysis-result {
       background: white;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin: 30px 0;
+      overflow: hidden;
+      display: none;
+      animation: fadeIn 0.5s ease;
     }
-    .style-selector {
-      margin: 15px 0;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .style-selector select {
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      background-color: white;
+
+    .mood-display {
+      padding: 15px 25px;
+      background: #f8f9fa;
+      font-weight: 600;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+
+    .mood-display i {
+      font-size: 1.5rem;
+    }
+
+    .ai-encouragement {
+      padding: 25px;
+      border-left: 5px solid var(--primary);
+      background: #f0f9ff;
+      margin: 0;
+    }
+
     .character-header {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
+
     .character-icon {
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      margin-right: 10px;
+      margin-right: 15px;
       object-fit: cover;
+      border: 2px solid white;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
-    #analyze-btn {
-      background-color: #2196F3;
+
+    .character-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--dark);
     }
-    #analyze-btn:hover {
-      background-color: #0b7dda;
+
+    .encouragement-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    .song-recommendation {
+      padding: 20px 25px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .song-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 30px;
+    }
+
+    .history-section {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+    }
+
+    .history-header {
+      padding: 20px 25px;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      display: flex;
+      align-items: center;
+    }
+
+    .history-header i {
+      margin-right: 12px;
+      font-size: 1.5rem;
+    }
+
+    #history {
+      list-style-type: none;
+      padding: 0;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    #history li {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #e9ecef;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    #history li:hover {
+      background: #f8f9fa;
+      transform: translateX(5px);
+    }
+
+    #history li:last-child {
+      border-bottom: none;
+    }
+
+    .diary-date {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .diary-content {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      padding-right: 30px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+
+    .delete-btn:hover {
+      background: #d32f2f;
+      transform: scale(1.05);
+    }
+
+    .empty-history {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--gray);
+      font-size: 0.9rem;
+      padding: 20px;
+    }
+
+    /* 情绪响应式色彩 */
+    .excited { --primary: #2196F3; --primary-light: #42a5f5; }
+    .happy { --primary: #4CAF50; --primary-light: #66bb6a; }
+    .calm { --primary: #03a9f4; --primary-light: #29b6f6; }
+    .sad { --primary: #ff9800; --primary-light: #ffb74d; }
+    .angry { --primary: #f44336; --primary-light: #ef5350; }
+    .anxious { --primary: #9c27b0; --primary-light: #ab47bc; }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .card, #analysis-result, .history-section {
+        border-radius: 16px;
+      }
+      
+      .buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Mai 日记</h1>
-  <textarea id="diary" rows="10" placeholder="记录下你今天的心情..."></textarea><br>
-  
-  <div class="style-selector">
-    <label for="ai-style">日记助手：</label>
-    <select id="ai-style">
-      <option value="default">麦麦（默认）</option>
-      <option value="elysia">爱莉希雅</option>
-    </select>
-  </div>
-  
-  <button onclick="saveDiary()">💾 保存日记</button>
-  <button id="analyze-btn" onclick="analyzeDiary()">🔍 听听麦麦的建议</button>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-book-open"></i> Mai 日记</h1>
+      <p class="subtitle">记录每日心情，获取个性化建议与音乐推荐</p>
+    </header>
 
-  <div id="analysis-result">
-    <h2 id="mood">情绪：</h2>
-    <div id="encouragement" class="ai-encouragement"></div>
-    <h3 id="song">推荐歌曲：</h3>
-    <audio id="player" controls></audio>
-  </div>
+    <main class="main-content">
+      <div class="card-header">
+        <i class="fas fa-pen"></i>
+        <h2 class="card-title">写下今天的日记</h2>
+      </div>
+      <div class="card">
+        <textarea id="diary" rows="6" placeholder="记录下你今天的心情、想法或经历..."></textarea>
+        
+        <div class="style-selector">
+          <label for="ai-style"><i class="fas fa-robot"></i> 日记助手：</label>
+          <select id="ai-style">
+            <option value="default">麦麦（默认）</option>
+            <option value="elysia">爱莉希雅</option>
+          </select>
+        </div>
+        
+        <div class="buttons">
+          <button class="btn btn-save" onclick="saveDiary()">
+            <i class="fas fa-save"></i> 保存日记
+          </button>
+          <button class="btn btn-analyze" id="analyze-btn" onclick="analyzeDiary()">
+            <i class="fas fa-comment-medical"></i> 听听麦麦的建议
+          </button>
+        </div>
+      </div>
+    </main>
 
-  <h2>📅 历史日记</h2>
-  <ul id="history"></ul>
+    <div id="analysis-result">
+      <div class="mood-display">
+        <i class="fas fa-heart"></i>
+        <h2 id="mood">情绪分析：</h2>
+      </div>
+      
+      <div id="encouragement" class="ai-encouragement">
+        <div class="character-header">
+          <img src="/static/characters/maimai.png" alt="麦麦" class="character-icon">
+          <div class="character-name">麦麦想对你说：</div>
+        </div>
+        <p class="encouragement-text">这里将显示根据你的日记内容生成的个性化建议和鼓励话语...</p>
+      </div>
+      
+      <div class="song-recommendation">
+        <div class="song-title">
+          <i class="fas fa-music"></i>
+          <h3 id="song">推荐歌曲：</h3>
+        </div>
+        <audio id="player" controls></audio>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-header">
+        <i class="fas fa-history"></i>
+        <h2 class="card-title">历史日记</h2>
+      </div>
+      <ul id="history">
+        <li>
+          <div class="diary-date">2023-10-15</div>
+          <div class="diary-content">今天是个美好的一天，阳光明媚，心情特别好！完成了项目的第一阶段，团队一起庆祝了成功。</div>
+          <button class="delete-btn" onclick="deleteDiary('2023-10-15')">
+            <i class="fas fa-trash"></i> 删除
+          </button>
+        </li>
+        <li>
+          <div class="diary-date">2023-10-14</div>
+          <div class="diary-content">今天有些疲惫，工作压力有点大。晚上去公园散步，看到美丽的日落，心情好了很多。</div>
+          <button class="delete-btn" onclick="deleteDiary('2023-10-14')">
+            <i class="fas fa-trash"></i> 删除
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>Mai 日记 - 你的情感日记助手 | 用心记录每一天</p>
+    </div>
+  </div>
 
   <script>
     // 角色配置信息
@@ -150,13 +518,51 @@
       }
     };
 
+    // 情绪与颜色类映射
+    const moodToClass = {
+      'happy': 'happy',
+      'excited': 'excited',
+      'grateful': 'happy',
+      'proud': 'happy',
+      'hopeful': 'happy',
+      'relieved': 'calm',
+      'content': 'calm',
+      'calm': 'calm',
+      'sad': 'sad',
+      'lonely': 'sad',
+      'bored': 'sad',
+      'angry': 'angry',
+      'anxious': 'anxious',
+      'fearful': 'anxious',
+      'surprised': 'excited',
+      'disgusted': 'angry',
+      'confused': 'anxious',
+      'nostalgic': 'calm',
+      'neutral': 'calm'
+    };
+
     // 更新分析按钮文字
     function updateAnalyzeButton() {
       const style = document.getElementById('ai-style').value;
       const character = characterConfig[style];
       const btn = document.getElementById('analyze-btn');
-      btn.textContent = `🔍 听听${character.name}的建议`;
-      btn.style.backgroundColor = character.btnColor;
+      btn.innerHTML = `<i class="fas fa-comment-medical"></i> 听听${character.name}的建议`;
+      btn.style.background = `linear-gradient(to right, ${character.btnColor}, ${lightenColor(character.btnColor, 20)})`;
+    }
+
+    // 辅助函数：颜色变亮
+    function lightenColor(color, percent) {
+      const num = parseInt(color.replace("#",""), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = (num >> 16) + amt;
+      const G = (num >> 8 & 0x00FF) + amt;
+      const B = (num & 0x0000FF) + amt;
+      return "#" + (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      ).toString(16).slice(1);
     }
 
     async function saveDiary() {
@@ -208,6 +614,9 @@
         // 更新情绪显示
         document.getElementById('mood').innerText = '情绪：' + data.mood;
         
+        // 更新页面主题色基于情绪
+        updateThemeBasedOnMood(data.mood);
+        
         // 获取当前角色配置
         const character = characterConfig[data.style_used || 'default'];
         
@@ -216,9 +625,9 @@
         encouragementDiv.innerHTML = `
           <div class="character-header">
             <img src="${character.icon}" alt="${character.name}" class="character-icon">
-            <h3>${character.name}想对你说：</h3>
+            <div class="character-name">${character.name}想对你说：</div>
           </div>
-          <p>${data.encouragement}</p>
+          <p class="encouragement-text">${data.encouragement}</p>
         `;
         encouragementDiv.style.borderLeftColor = character.color;
         
@@ -231,6 +640,17 @@
       } catch (error) {
         alert("分析失败: " + error.message);
       }
+    }
+
+    // 根据情绪更新主题
+    function updateThemeBasedOnMood(mood) {
+      // 移除所有情绪类
+      const classes = Object.values(moodToClass);
+      document.body.classList.remove(...classes);
+      
+      // 添加当前情绪类
+      const moodClass = moodToClass[mood] || 'calm';
+      document.body.classList.add(moodClass);
     }
 
     async function deleteDiary(date) {
@@ -264,16 +684,18 @@
         list.innerHTML = '';
         
         if (data.length === 0) {
-          list.innerHTML = '<li>暂无历史日记</li>';
+          list.innerHTML = '<div class="empty-history">暂无历史日记，开始记录你的心情吧！</div>';
           return;
         }
         
         for (const d of data) {
           const li = document.createElement('li');
           li.innerHTML = `
-            <strong>${d.date}</strong>
-            <button class="delete-btn" onclick="deleteDiary('${d.date}')">删除</button>
-            <p>${d.content}</p>
+            <div class="diary-date">${d.date}</div>
+            <div class="diary-content">${d.content}</div>
+            <button class="delete-btn" onclick="deleteDiary('${d.date}')">
+              <i class="fas fa-trash"></i> 删除
+            </button>
           `;
           list.appendChild(li);
         }
@@ -291,8 +713,7 @@
       const styleSelector = document.getElementById('ai-style');
       styleSelector.addEventListener('change', function() {
         const style = this.value;
-        const character = characterConfig[style];
-        this.style.borderColor = character.color;
+        this.style.borderColor = characterConfig[style].color;
         updateAnalyzeButton();
       });
       
@@ -300,6 +721,9 @@
       const initialStyle = styleSelector.value;
       styleSelector.style.borderColor = characterConfig[initialStyle].color;
       updateAnalyzeButton();
+      
+      // 设置初始主题
+      document.body.classList.add('calm');
     };
   </script>
 </body>
