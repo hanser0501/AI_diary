@@ -62,7 +62,7 @@ def delete():
         conn.execute("DELETE FROM diary WHERE date = ?", (date,))
     return jsonify({'status': 'success'})
 
-# 情绪分析 + 推荐歌曲
+# 情绪分析 + 推荐歌曲 + 颜色推荐
 @app.route('/analyze', methods=['POST'])
 def analyze():
     content = request.json.get('content')
@@ -92,6 +92,32 @@ def analyze():
     )
     encouragement = encouragement_response.choices[0].message.content.strip()
     
+    # 第三部分：情绪对应的颜色配置（文字颜色 + 推荐颜色）
+    # 逻辑：难过时用暖色调(黄/橙)改善心情，愤怒时用冷色调(蓝/青)平复情绪
+    mood_to_color = {
+        'happy': {
+            'text_color': '#2E7D32',  # 深绿
+            'recommend_color': '#2E7D32',
+            'color_name': '深绿色'
+        },
+        'sad': {
+            'text_color': '#FF9800',  # 橙色
+            'recommend_color': '#FF9800',
+            'color_name': '橙色'
+        },
+        'angry': {
+            'text_color': '#03A9F4',  # 亮蓝
+            'recommend_color': '#03A9F4',
+            'color_name': '亮蓝色'
+        },
+        'neutral': {
+            'text_color': '#607D8B',  # 蓝灰
+            'recommend_color': '#607D8B',
+            'color_name': '蓝灰色'
+        }
+    }
+    color_info = mood_to_color.get(mood, mood_to_color['neutral'])
+    
     # 歌曲推荐
     mood_to_song = {
         'happy': {'name': 'Happy - Pharrell Williams', 'url': '/static/happy.mp3'},
@@ -105,7 +131,10 @@ def analyze():
         'mood': mood,
         'song': song,
         'encouragement': encouragement,
-        'ai_reply': f"检测到你的心情是{mood}。{encouragement}"
+        'ai_reply': f"检测到你的心情是{mood}。{encouragement}",
+        'text_color': color_info['text_color'],
+        'recommend_color': color_info['recommend_color'],
+        'color_name': color_info['color_name']
     })
 
 if __name__ == '__main__':
